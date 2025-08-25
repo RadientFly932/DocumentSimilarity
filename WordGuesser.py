@@ -1,3 +1,5 @@
+#Goal: make an algorithm that takes in files, and takes in another text,
+#and determines in % how similar it is.
 import pandas
 import os
 import re
@@ -28,12 +30,14 @@ def main():
     addFolderAsWordData("inputData")
     inputWordData = curDataFrameWritingTo
     
+    #adds the percent values to each data frame
     updatePercents(wordData)
     updatePercents(inputWordData)
-    print(f"Training Word data:\n{wordData}\n\n\n\n")
-    print(f"Input Word data:\n{inputWordData}\n\n\n\n")
-
-
+    #print(f"Training Word data:\n{wordData}\n\n\n\n")
+    #print(f"Input Word data:\n{inputWordData}\n\n\n\n")
+    
+    percentSimilarity = compareTexts(inputWordData, wordData)
+    print("The texts are " + str(percentSimilarity) + "% similar.")
 
 
 #for any given data frame, this adds a column of a 'percent'
@@ -50,10 +54,28 @@ def updatePercents(dataFrame):
     for row in dataFrame.itertuples():
         dataFrame.at[row.Index, "percent"] = (row.count / totalWords) * 100
     
-    
-    
 
-#********************INITIALIZING*********************************
+#***************************COMPARISON***********************************#
+
+
+#This will take in 2 data frames with the percent values and returns how similar they are in percent
+def compareTexts(inputData, trainingData):
+    totalInputWords = len(inputData)
+    totalPercentDifference = 0
+    totalSimilarWords = 0
+    
+    for row in inputData.itertuples(): #technically input and training could be different, but input should generally be shorter
+        #print("\n" + row.word)
+        if (trainingData["word"].isin([row.word]).any()): #if the word in input is also in training
+            #print(row.word + " in Input data is also in trainingData")
+            totalSimilarWords += 1
+            
+    #print("\ntotal input words: " + str(totalInputWords) + ", total similar words: " + str(totalSimilarWords) + ", ratio: " + str(totalSimilarWords / totalInputWords))
+    percentSimilarity = round(totalSimilarWords / totalInputWords, 8) * 100
+    return percentSimilarity
+
+
+#********************INITIALIZING****************************************#
 
 
 #this function will take in a folder of files that it will
